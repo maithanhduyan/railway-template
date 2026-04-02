@@ -6,9 +6,9 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 RUN pip3 install --no-cache-dir --break-system-packages boto3
 
-COPY --chmod=755 ./entrypoint.sh /odoo-entrypoint.sh
-COPY --chmod=755 ./addons /mnt/extra-addons
-COPY ./odoo.conf /etc/odoo/odoo.conf.template
+COPY --chmod=755 ./odoo/entrypoint.sh /odoo-entrypoint.sh
+COPY ./odoo/addons /mnt/extra-addons
+COPY ./odoo/odoo.conf /etc/odoo/odoo.conf.template
 
 ENTRYPOINT ["/odoo-entrypoint.sh"]
 CMD ["odoo"]
