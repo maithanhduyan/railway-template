@@ -1,6 +1,6 @@
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile.16"
+dockerfilePath = "Dockerfile"
 watchPatterns = ["postgres/**"]
 
 [deploy]
