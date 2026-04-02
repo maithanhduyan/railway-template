@@ -41,6 +41,9 @@ export SMTP_USER="${SMTP_USER:-}"
 export SMTP_PASSWORD="${SMTP_PASSWORD:-}"
 export SMTP_SSL="${SMTP_SSL:-False}"
 export EMAIL_FROM="${EMAIL_FROM:-}"
+export REDIS_HOST="${REDIS_HOST:-redis}"
+export REDIS_PORT="${REDIS_PORT:-6379}"
+
 
 # with_demo is the inverse of WITHOUT_DEMO
 case "${WITHOUT_DEMO:-True}" in
