@@ -17,4 +17,7 @@ COPY init.sql /docker-entrypoint-initdb.d/init.sql
 COPY conf/postgresql.conf /etc/postgresql/postgresql.conf
 COPY conf/pg_hba.conf /etc/postgresql/pg_hba.conf
 
-CMD [ "postgres","-c","config_file=/etc/postgresql/postgresql.conf","-c","hba_file=/etc/postgresql/pg_hba.conf" ]
+CMD [ "postgres", \
+      "-c", "config_file=/etc/postgresql/postgresql.conf", \
+      "-c", "hba_file=/etc/postgresql/pg_hba.conf", \
+      "-c", "logging_collector=off" ]

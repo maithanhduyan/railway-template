@@ -58,6 +58,27 @@ envsubst < /etc/odoo/odoo.conf.template > /etc/odoo/odoo.conf
 find /var/lib/odoo /var/log/odoo -not -user odoo -exec chown odoo:odoo {} + 2>/dev/null || true
 chown odoo:odoo /etc/odoo/odoo.conf
 
+# ── Wait for PostgreSQL ──
+echo "Waiting for PostgreSQL (${DB_HOST}:${DB_PORT})..."
+for i in $(seq 1 60); do
+  if gosu odoo python3 -c "
+import psycopg2, os
+psycopg2.connect(
+    host=os.environ['DB_HOST'],
+    port=os.environ['DB_PORT'],
+    user=os.environ['DB_USER'],
+    password=os.environ['DB_PASSWORD'],
+    dbname='postgres',
+    connect_timeout=5
+).close()
+" 2>/dev/null; then
+    echo "PostgreSQL is ready"
+    break
+  fi
+  echo "  attempt $i/60 — retrying in 3s..."
+  sleep 3
+done
+
 # ── S3 bucket init (wait for MinIO, run as odoo) ──
 if [ -n "$S3_ENDPOINT" ]; then
   case "$S3_ENDPOINT" in
