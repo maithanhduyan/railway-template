@@ -7,7 +7,7 @@ on:
     paths:
       - "templates/odoo-19.0/postgres/**"
       - ".github/workflows/postgres.yml"
-      - "get-postgres-version.sh"
+      - "templates/odoo-19.0/postgres/get-postgres-version.sh"
   workflow_dispatch:
 
 env:
@@ -44,8 +44,8 @@ jobs:
         if: steps.check_dockerfile.outputs.skip != 'true'
         id: get_version
         run: |
-          chmod +x ./get-postgres-version.sh
-          MINOR_VERSION=$(./get-postgres-version.sh ${{ matrix.postgres_major }})
+          chmod +x templates/odoo-19.0/postgres/get-postgres-version.sh
+          MINOR_VERSION=$(templates/odoo-19.0/postgres/get-postgres-version.sh ${{ matrix.postgres_major }})
           echo "minor_version=${MINOR_VERSION}" >> $GITHUB_OUTPUT
           echo "Building PostgreSQL $MINOR_VERSION with tags: ${{ matrix.postgres_major }}, ${MINOR_VERSION}"
 

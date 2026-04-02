@@ -1,7 +1,7 @@
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
-watchPatterns = ["postgres/**"]
+watchPatterns = ["templates/odoo-19.0/postgres/**"]
 
 [deploy]
 restartPolicyType = "ON_FAILURE"

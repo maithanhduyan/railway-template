@@ -12,15 +12,15 @@ RUN apt-get update \
 # WAL archive directory
 RUN mkdir -p /backups/wal && chown postgres:postgres /backups/wal
 
-# Extensions: pg_trgm, unaccent, pgcrypto, vector, pg_stat_statements
-COPY init.sql /docker-entrypoint-initdb.d/init.sql
-
 # Allow the postgres user to execute certain commands as root without a password
 RUN echo "postgres ALL=(root) NOPASSWD: /usr/bin/mkdir, /bin/chown, /usr/bin/openssl" > /etc/sudoers.d/postgres
 
 # Add init scripts while setting permissions
-COPY --chmod=755 ./postgres/init-ssl.sh /docker-entrypoint-initdb.d/init-ssl.sh
-COPY --chmod=755 ./postgres/wrapper.sh /usr/local/bin/wrapper.sh
+COPY --chmod=755 ./init-ssl.sh /docker-entrypoint-initdb.d/init-ssl.sh
+COPY --chmod=755 ./wrapper.sh /usr/local/bin/wrapper.sh
+
+# Extensions: pg_trgm, unaccent, pgcrypto, vector, pg_stat_statements
+COPY init.sql /docker-entrypoint-initdb.d/init.sql
 
 ENTRYPOINT ["wrapper.sh"]
 CMD ["postgres", "-p", "5432", "-c", "listen_addresses=*"]
