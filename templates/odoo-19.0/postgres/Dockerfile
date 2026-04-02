@@ -1,8 +1,9 @@
-FROM postgres:18-bookworm
+ARG POSTGRES_VERSION=18
+FROM postgres:${POSTGRES_VERSION}
 
 # Vietnamese locale + pgvector
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+    && apt-get install -y --no-install-recommends openssl sudo \
        locales postgresql-18-pgvector \
     && sed -i '/vi_VN.UTF-8/s/^# //' /etc/locale.gen \
     && locale-gen vi_VN.UTF-8 \
@@ -14,10 +15,12 @@ RUN mkdir -p /backups/wal && chown postgres:postgres /backups/wal
 # Extensions: pg_trgm, unaccent, pgcrypto, vector, pg_stat_statements
 COPY init.sql /docker-entrypoint-initdb.d/init.sql
 
-COPY conf/postgresql.conf /etc/postgresql/postgresql.conf
-COPY conf/pg_hba.conf /etc/postgresql/pg_hba.conf
+# Allow the postgres user to execute certain commands as root without a password
+RUN echo "postgres ALL=(root) NOPASSWD: /usr/bin/mkdir, /bin/chown, /usr/bin/openssl" > /etc/sudoers.d/postgres
 
-CMD [ "postgres", \
-      "-c", "config_file=/etc/postgresql/postgresql.conf", \
-      "-c", "hba_file=/etc/postgresql/pg_hba.conf", \
-      "-c", "logging_collector=off" ]
+# Add init scripts while setting permissions
+COPY --chmod=755 ./postgres/init-ssl.sh /docker-entrypoint-initdb.d/init-ssl.sh
+COPY --chmod=755 ./postgres/wrapper.sh /usr/local/bin/wrapper.sh
+
+ENTRYPOINT ["wrapper.sh"]
+CMD ["postgres", "-p", "5432", "-c", "listen_addresses=*"]
