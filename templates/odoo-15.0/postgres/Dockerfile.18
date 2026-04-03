@@ -1,8 +1,8 @@
-ARG POSTGRES_VERSION=12
+ARG POSTGRES_VERSION=18
 FROM postgres:${POSTGRES_VERSION}
 
 # Install OpenSSL, sudo, and pgvector
-RUN apt-get update && apt-get install -y openssl sudo postgresql-12-pgvector \
+RUN apt-get update && apt-get install -y openssl sudo postgresql-18-pgvector \
     && rm -rf /var/lib/apt/lists/*
 
 # Allow the postgres user to execute certain commands as root without a password
