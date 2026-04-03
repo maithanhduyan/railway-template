@@ -54,6 +54,32 @@ esac
 # ── Render config template ──
 envsubst < /etc/odoo/odoo.conf.template > /etc/odoo/odoo.conf
 
+# ── Clone extra addons at runtime ──
+# EXTRA_ADDONS_REPOS: comma-separated list of git repo URLs
+# Default repos if not set:
+EXTRA_ADDONS_REPOS="${EXTRA_ADDONS_REPOS:-https://github.com/maithanhduyan/s3_attachment.git,https://github.com/maithanhduyan/session_redis.git,https://github.com/maithanhduyan/vn_accounting.git}"
+EXTRA_ADDONS_DIR="${EXTRA_ADDONS_DIR:-/mnt/extra-addons}"
+
+if [ -n "$EXTRA_ADDONS_REPOS" ]; then
+  echo "Cloning extra addons..."
+  OLD_IFS="$IFS"; IFS=','
+  for repo in $EXTRA_ADDONS_REPOS; do
+    repo=$(echo "$repo" | xargs)  # trim whitespace
+    addon_name=$(basename "$repo" .git)
+    target="$EXTRA_ADDONS_DIR/$addon_name"
+    if [ -d "$target" ] && [ "$(ls -A "$target" 2>/dev/null)" ]; then
+      echo "  $addon_name already exists, pulling latest..."
+      git -C "$target" pull --ff-only 2>/dev/null || echo "  Warning: pull failed for $addon_name, using existing"
+    else
+      echo "  Cloning $addon_name..."
+      git clone --depth 1 "$repo" "$target" || echo "  Warning: clone failed for $addon_name"
+    fi
+  done
+  IFS="$OLD_IFS"
+  chown -R odoo:odoo "$EXTRA_ADDONS_DIR" 2>/dev/null || true
+  echo "Extra addons ready."
+fi
+
 # ── Fix ownership for mounted volumes (only if needed) ──
 find /var/lib/odoo /var/log/odoo -not -user odoo -exec chown odoo:odoo {} + 2>/dev/null || true
 chown odoo:odoo /etc/odoo/odoo.conf
