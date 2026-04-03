@@ -4,7 +4,7 @@ USER root
 RUN apt-get update \
  && apt-get install -y --no-install-recommends gettext-base gosu git \
  && rm -rf /var/lib/apt/lists/*
-RUN pip3 install --no-cache-dir --break-system-packages boto3
+RUN pip3 install --no-cache-dir --break-system-packages boto3 redis
 
 RUN git clone --depth 1 https://github.com/maithanhduyan/s3_attachment.git /mnt/extra-addons/s3_attachment \
  && git clone --depth 1 https://github.com/maithanhduyan/session_redis.git /mnt/extra-addons/session_redis \
